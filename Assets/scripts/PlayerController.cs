@@ -18,6 +18,10 @@ public class PlayerController : MonoBehaviour {
     public int numberOfJumps = 2;
     public float glidingScale = 0.3f;
 
+    [Header("Combat")]
+    public float dashAttackDistance = 1.0f;
+    public float dashAttackDuration = 0.2f;
+
     #endregion
 
     #region unity methods
@@ -39,21 +43,30 @@ public class PlayerController : MonoBehaviour {
         float horizontalInput = Input.GetAxis("Horizontal");
         bool tryJump = Input.GetKeyDown("space");
         bool tryGlide = Input.GetKey("space");
+        bool tryDashAttack = Input.GetButtonDown("Attack1");
 
         //update systems
         UpdateRotation(horizontalInput);
         bool didJump = UpdateJump(tryJump);
         UpdateGliding(tryGlide);
+        UpdateDashAttack(tryDashAttack, horizontalInput);
         UpdateVelocity(horizontalInput);
 
         //update animator state
         animator.SetBool("isGrounded", characterController.isGrounded);
-        animator.SetFloat("hSpeed", Mathf.Abs(velocity.x) / groundSpeed);
+        if (velocity.x != 0)
+        {
+            animator.SetFloat("hSpeed", Mathf.Abs(velocity.x) / groundSpeed);
+        } else
+        {
+            animator.SetFloat("hSpeed", 0.01f);
+        }
         animator.SetFloat("vSpeed", velocity.y);
         if (didJump)
         {
             animator.SetTrigger("onJump");
         }
+        animator.SetBool("isDashAttacking", isDashAttacking);
 
 		// convert velocity to displacement and Move the character:
 		characterController.Move(velocity * Time.deltaTime);
@@ -77,8 +90,8 @@ public class PlayerController : MonoBehaviour {
             facingRight = false;
         }
         float desiredYRot = facingRight ? 90 : -90;
-        yRot = Mathf.SmoothDampAngle(yRot, desiredYRot, ref yRotVel, turnRate);
-        transform.localEulerAngles = new Vector3(0, yRot, 0);
+        yRot = Mathf.SmoothDamp(yRot, desiredYRot, ref yRotVel, turnRate);
+        transform.localEulerAngles = new Vector3(0, desiredYRot, 0);
     }
     #endregion
 
@@ -95,6 +108,17 @@ public class PlayerController : MonoBehaviour {
         } else
         {
             desiredVelocity.x = horizontalInput * airSpeed;
+        }
+
+        //apply attacking
+        if (isDashAttacking)
+        {
+            //override movement
+            float dashAttackDirection = facingRight ? 1 : -1;
+            velocity.x = dashAttackDirection * (dashAttackDistance / dashAttackDuration);
+            print("dashspeed: " + velocity.x);
+            velocity.y = 0;
+            return;
         }
         
         //clear verical velocity if grounded to avoid gravity building it up too much
@@ -127,7 +151,8 @@ public class PlayerController : MonoBehaviour {
         }
         
         //smooth out velocity
-        velocity = Vector2.SmoothDamp(velocity, desiredVelocity, ref acceleration, 0.1f);
+        //velocity = Vector2.SmoothDamp(velocity, desiredVelocity, ref acceleration, 0.1f);
+        velocity = desiredVelocity;
     }
     #endregion
 
@@ -174,6 +199,33 @@ public class PlayerController : MonoBehaviour {
         if (characterController.isGrounded == false)
         {
             isGliding = tryGlide;
+        }
+    }
+
+    #endregion
+
+    #region Attack Logic
+    bool isDashAttacking = false;
+    float dashAttackTick = 0;
+
+    //returns true if we're currently in a state of attacking
+    void UpdateDashAttack(bool tryAttack, float horizontalInput)
+    {
+        if (dashAttackTick < dashAttackDuration)
+        {
+            dashAttackTick += Time.deltaTime;
+            if(dashAttackTick > dashAttackDuration)
+            {
+                dashAttackTick = dashAttackDuration;
+                isDashAttacking = false;
+                print("End dash");
+            }
+        }
+        if (tryAttack == true && isDashAttacking == false)
+        {
+            print("dash attack");
+            isDashAttacking = true;
+            dashAttackTick = 0;
         }
     }
 
