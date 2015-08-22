@@ -9,8 +9,6 @@ public class FollowCamera : MonoBehaviour {
 
     Vector3 followVelocity = Vector3.zero;
 
-    bool snapOnce = true;
-
 	// Use this for initialization
 	void Start () 
     {
