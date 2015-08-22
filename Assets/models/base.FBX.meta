@@ -1,72 +1,82 @@
 fileFormatVersion: 2
-guid: cb9d907c74c3a6245aa447d30d7c2ed4
-timeCreated: 1440268411
+guid: 87916a02a772d8648a55305e83fc0efe
+timeCreated: 1440274408
 licenseType: Free
 ModelImporter:
   serializedVersion: 18
   fileIDToRecycleName:
     100000: //RootNode
-    100002: Base HumanHead
-    100004: Base HumanHeadBone001
-    100006: Base HumanLCalf
-    100008: Base HumanLCollarbone
-    100010: Base HumanLFoot
-    100012: Base HumanLForearm
-    100014: Base HumanLPalm
-    100016: Base HumanLThigh
-    100018: Base HumanLToe11
-    100020: Base HumanLUpperarm
-    100022: Base HumanNeck
-    100024: Base HumanPelvis
-    100026: Base HumanRCalf
-    100028: Base HumanRCollarbone
-    100030: Base HumanRFoot
-    100032: Base HumanRForearm
-    100034: Base HumanRibcage
-    100036: Base HumanRPalm
-    100038: Base HumanRThigh
-    100040: Base HumanRToe11
-    100042: Base HumanRUpperarm
-    100044: Base HumanSpine1
-    100046: Base HumanSpine2
-    100048: Base HumanSpine3
-    100050: mesh_body
-    100052: mesh_head
-    100054: mesh_left_arm
-    100056: mesh_left_leg
-    100058: mesh_right_arm
-    100060: mesh_right_leg
+    100002: Base Human
+    100004: Base HumanHead
+    100006: Base HumanHeadBone001
+    100008: Base HumanLCalf
+    100010: Base HumanLCollarbone
+    100012: Base HumanLFoot
+    100014: Base HumanLForearm
+    100016: Base HumanLIKTarget
+    100018: Base HumanLPalm
+    100020: Base HumanLPlatform
+    100022: Base HumanLThigh
+    100024: Base HumanLToe11
+    100026: Base HumanLUpperarm
+    100028: Base HumanNeck
+    100030: Base HumanPelvis
+    100032: Base HumanRCalf
+    100034: Base HumanRCollarbone
+    100036: Base HumanRFoot
+    100038: Base HumanRForearm
+    100040: Base HumanRibcage
+    100042: Base HumanRIKTarget
+    100044: Base HumanRPalm
+    100046: Base HumanRPlatform
+    100048: Base HumanRThigh
+    100050: Base HumanRToe11
+    100052: Base HumanRUpperarm
+    100054: Base HumanSpine1
+    100056: Base HumanSpine2
+    100058: Base HumanSpine3
+    100060: mesh_body
+    100062: mesh_head
+    100064: mesh_left_arm
+    100066: mesh_left_leg
+    100068: mesh_right_arm
+    100070: mesh_right_leg
     400000: //RootNode
-    400002: Base HumanHead
-    400004: Base HumanHeadBone001
-    400006: Base HumanLCalf
-    400008: Base HumanLCollarbone
-    400010: Base HumanLFoot
-    400012: Base HumanLForearm
-    400014: Base HumanLPalm
-    400016: Base HumanLThigh
-    400018: Base HumanLToe11
-    400020: Base HumanLUpperarm
-    400022: Base HumanNeck
-    400024: Base HumanPelvis
-    400026: Base HumanRCalf
-    400028: Base HumanRCollarbone
-    400030: Base HumanRFoot
-    400032: Base HumanRForearm
-    400034: Base HumanRibcage
-    400036: Base HumanRPalm
-    400038: Base HumanRThigh
-    400040: Base HumanRToe11
-    400042: Base HumanRUpperarm
-    400044: Base HumanSpine1
-    400046: Base HumanSpine2
-    400048: Base HumanSpine3
-    400050: mesh_body
-    400052: mesh_head
-    400054: mesh_left_arm
-    400056: mesh_left_leg
-    400058: mesh_right_arm
-    400060: mesh_right_leg
+    400002: Base Human
+    400004: Base HumanHead
+    400006: Base HumanHeadBone001
+    400008: Base HumanLCalf
+    400010: Base HumanLCollarbone
+    400012: Base HumanLFoot
+    400014: Base HumanLForearm
+    400016: Base HumanLIKTarget
+    400018: Base HumanLPalm
+    400020: Base HumanLPlatform
+    400022: Base HumanLThigh
+    400024: Base HumanLToe11
+    400026: Base HumanLUpperarm
+    400028: Base HumanNeck
+    400030: Base HumanPelvis
+    400032: Base HumanRCalf
+    400034: Base HumanRCollarbone
+    400036: Base HumanRFoot
+    400038: Base HumanRForearm
+    400040: Base HumanRibcage
+    400042: Base HumanRIKTarget
+    400044: Base HumanRPalm
+    400046: Base HumanRPlatform
+    400048: Base HumanRThigh
+    400050: Base HumanRToe11
+    400052: Base HumanRUpperarm
+    400054: Base HumanSpine1
+    400056: Base HumanSpine2
+    400058: Base HumanSpine3
+    400060: mesh_body
+    400062: mesh_head
+    400064: mesh_left_arm
+    400066: mesh_left_leg
+    400068: mesh_right_arm
+    400070: mesh_right_leg
     4300000: mesh_body
     4300002: mesh_head
     4300004: mesh_right_arm
@@ -105,7 +115,7 @@ ModelImporter:
       name: base
       takeName: Take 001
       firstFrame: 0
-      lastFrame: 15
+      lastFrame: 60
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -126,6 +136,12 @@ ModelImporter:
       events: []
       transformMask:
       - path: 
+        weight: 1
+      - path: Base Human
+        weight: 1
+      - path: Base HumanLIKTarget
+        weight: 1
+      - path: Base HumanLPlatform
         weight: 1
       - path: Base HumanPelvis
         weight: 1
@@ -190,6 +206,10 @@ ModelImporter:
       - path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
           HumanRibcage/Base HumanRCollarbone/Base HumanRUpperarm/Base HumanRForearm/Base
           HumanRPalm
+        weight: 1
+      - path: Base HumanRIKTarget
+        weight: 1
+      - path: Base HumanRPlatform
         weight: 1
       - path: mesh_body
         weight: 1
