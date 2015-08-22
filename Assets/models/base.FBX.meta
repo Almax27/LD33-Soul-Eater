@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: cb9d907c74c3a6245aa447d30d7c2ed4
-timeCreated: 1440267125
+timeCreated: 1440268411
 licenseType: Free
 ModelImporter:
   serializedVersion: 18
@@ -30,12 +30,12 @@ ModelImporter:
     100044: Base HumanSpine1
     100046: Base HumanSpine2
     100048: Base HumanSpine3
-    100050: Box001
-    100052: Object001
-    100054: Object002
-    100056: Object003
-    100058: Object004
-    100060: Object005
+    100050: mesh_body
+    100052: mesh_head
+    100054: mesh_left_arm
+    100056: mesh_left_leg
+    100058: mesh_right_arm
+    100060: mesh_right_leg
     400000: //RootNode
     400002: Base HumanHead
     400004: Base HumanHeadBone001
@@ -61,26 +61,26 @@ ModelImporter:
     400044: Base HumanSpine1
     400046: Base HumanSpine2
     400048: Base HumanSpine3
-    400050: Box001
-    400052: Object001
-    400054: Object002
-    400056: Object003
-    400058: Object004
-    400060: Object005
-    4300000: Box001
-    4300002: Object001
-    4300004: Object002
-    4300006: Object003
-    4300008: Object004
-    4300010: Object005
-    7400000: Take 001
+    400050: mesh_body
+    400052: mesh_head
+    400054: mesh_left_arm
+    400056: mesh_left_leg
+    400058: mesh_right_arm
+    400060: mesh_right_leg
+    4300000: mesh_body
+    4300002: mesh_head
+    4300004: mesh_right_arm
+    4300006: mesh_left_arm
+    4300008: mesh_right_leg
+    4300010: mesh_left_leg
+    7400000: base
     9500000: //RootNode
-    13700000: Box001
-    13700002: Object001
-    13700004: Object002
-    13700006: Object003
-    13700008: Object004
-    13700010: Object005
+    13700000: mesh_body
+    13700002: mesh_head
+    13700004: mesh_left_arm
+    13700006: mesh_left_leg
+    13700008: mesh_right_arm
+    13700010: mesh_right_leg
   materials:
     importMaterials: 1
     materialName: 0
@@ -100,7 +100,111 @@ ModelImporter:
     animationScaleError: .5
     animationWrapMode: 0
     extraExposedTransformPaths: []
-    clipAnimations: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: base
+      takeName: Take 001
+      firstFrame: 0
+      lastFrame: 15
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Base HumanPelvis
+        weight: 1
+      - path: Base HumanPelvis/Base HumanLThigh
+        weight: 1
+      - path: Base HumanPelvis/Base HumanLThigh/Base HumanLCalf
+        weight: 1
+      - path: Base HumanPelvis/Base HumanLThigh/Base HumanLCalf/Base HumanLFoot
+        weight: 1
+      - path: Base HumanPelvis/Base HumanLThigh/Base HumanLCalf/Base HumanLFoot/Base
+          HumanLToe11
+        weight: 1
+      - path: Base HumanPelvis/Base HumanRThigh
+        weight: 1
+      - path: Base HumanPelvis/Base HumanRThigh/Base HumanRCalf
+        weight: 1
+      - path: Base HumanPelvis/Base HumanRThigh/Base HumanRCalf/Base HumanRFoot
+        weight: 1
+      - path: Base HumanPelvis/Base HumanRThigh/Base HumanRCalf/Base HumanRFoot/Base
+          HumanRToe11
+        weight: 1
+      - path: Base HumanPelvis/Base HumanSpine1
+        weight: 1
+      - path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2
+        weight: 1
+      - path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3
+        weight: 1
+      - path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+          HumanRibcage
+        weight: 1
+      - path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+          HumanRibcage/Base HumanLCollarbone
+        weight: 1
+      - path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+          HumanRibcage/Base HumanLCollarbone/Base HumanLUpperarm
+        weight: 1
+      - path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+          HumanRibcage/Base HumanLCollarbone/Base HumanLUpperarm/Base HumanLForearm
+        weight: 1
+      - path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+          HumanRibcage/Base HumanLCollarbone/Base HumanLUpperarm/Base HumanLForearm/Base
+          HumanLPalm
+        weight: 1
+      - path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+          HumanRibcage/Base HumanNeck
+        weight: 1
+      - path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+          HumanRibcage/Base HumanNeck/Base HumanHead
+        weight: 1
+      - path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+          HumanRibcage/Base HumanNeck/Base HumanHead/Base HumanHeadBone001
+        weight: 1
+      - path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+          HumanRibcage/Base HumanRCollarbone
+        weight: 1
+      - path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+          HumanRibcage/Base HumanRCollarbone/Base HumanRUpperarm
+        weight: 1
+      - path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+          HumanRibcage/Base HumanRCollarbone/Base HumanRUpperarm/Base HumanRForearm
+        weight: 1
+      - path: Base HumanPelvis/Base HumanSpine1/Base HumanSpine2/Base HumanSpine3/Base
+          HumanRibcage/Base HumanRCollarbone/Base HumanRUpperarm/Base HumanRForearm/Base
+          HumanRPalm
+        weight: 1
+      - path: mesh_body
+        weight: 1
+      - path: mesh_head
+        weight: 1
+      - path: mesh_left_arm
+        weight: 1
+      - path: mesh_left_leg
+        weight: 1
+      - path: mesh_right_arm
+        weight: 1
+      - path: mesh_right_leg
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
     isReadable: 1
   meshes:
     lODScreenPercentages: []
