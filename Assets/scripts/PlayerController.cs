@@ -3,29 +3,24 @@ using System.Collections;
 
 public class PlayerController : MonoBehaviour {
 
+    #region public variables
+
+    [Header("Component Links")]
 	public CharacterController characterController = null;
     public Animator animator = null;
 
+    [Header("Platforming")]
+    public float gravity = 9.8f;
 	public float groundSpeed = 10; // units per second
 	public float airSpeed = 5;
-
 	public float turnRate = 0.3f; // time to turn 180
-
     public AnimationCurve jumpCurve = new AnimationCurve();
     public int numberOfJumps = 2;
+    public float glidingScale = 0.3f;
 
-    public float gravity = 9.8f;
+    #endregion
 
-	Vector2 velocity = Vector2.zero;
-    Vector2 acceleration = Vector2.zero;
-
-    bool facingRight = true;
-	float yRot = 0;
-	float yRotVel = 0;
-
-    float jumpTick = float.MaxValue;
-    int jumpsRemaining = 0;
-    float lastJumpHeight = 0;
+    #region unity methods
 
 	// Use this for initialization
 	void Start () 
@@ -34,6 +29,7 @@ public class PlayerController : MonoBehaviour {
 		{
 			characterController = GetComponent<CharacterController>();
 		}
+        jumpsRemaining = numberOfJumps;
 	}
 	
 	// Update is called once per frame
@@ -42,10 +38,12 @@ public class PlayerController : MonoBehaviour {
         //get input
         float horizontalInput = Input.GetAxis("Horizontal");
         bool tryJump = Input.GetKeyDown("space");
+        bool tryGlide = Input.GetKey("space");
 
         //update systems
         UpdateRotation(horizontalInput);
         bool didJump = UpdateJump(tryJump);
+        UpdateGliding(tryGlide);
         UpdateVelocity(horizontalInput);
 
         //update animator state
@@ -61,6 +59,13 @@ public class PlayerController : MonoBehaviour {
 		characterController.Move(velocity * Time.deltaTime);
 	}
 
+    #endregion
+
+    #region Rotation Logic
+    bool facingRight = true;
+    float yRot = 0;
+    float yRotVel = 0;
+
     void UpdateRotation(float horizontalInput)
     {
         //rotate the player to face direction of movement
@@ -75,11 +80,14 @@ public class PlayerController : MonoBehaviour {
         yRot = Mathf.SmoothDampAngle(yRot, desiredYRot, ref yRotVel, turnRate);
         transform.localEulerAngles = new Vector3(0, yRot, 0);
     }
+    #endregion
 
+    #region Movement Logic
+    Vector2 desiredVelocity = Vector2.zero;
+    Vector2 velocity = Vector2.zero;
+    Vector2 acceleration = Vector2.zero;
     void UpdateVelocity(float horizontalInput)
     {
-        Vector2 desiredVelocity = Vector2.zero;
-
         //apply input
         if (characterController.isGrounded)
         {
@@ -95,23 +103,38 @@ public class PlayerController : MonoBehaviour {
             desiredVelocity.y = 0;
         }
 
-        //apply gravity
-        desiredVelocity.y -= gravity * Time.deltaTime;
+        //apply gravity, scaled if gliding
+        if (isGliding)
+        {
+            desiredVelocity.y -= gravity * Time.deltaTime * glidingScale;
+        } else
+        {
+            desiredVelocity.y -= gravity * Time.deltaTime;
+        }
 
         //calculate jump velocity
         //We calulate the delta step on the animation curve and then override gravity if not 0
-        jumpTick += Time.deltaTime;
-        float newJumpHeight = jumpCurve.Evaluate(jumpTick);
-        lastJumpHeight = newJumpHeight;
-        float jumpDelta = (lastJumpHeight - lastJumpHeight);
-        if (jumpDelta != 0)
+        if (jumpTick >= 0) //ensure tick is > 1 i.e. we've jumped at least once
         {
-            desiredVelocity.y = jumpDelta / Time.deltaTime;
+            jumpTick += Time.deltaTime;
+            float newJumpHeight = jumpCurve.Evaluate(jumpTick);
+            float jumpDelta = (newJumpHeight - lastJumpHeight);
+            if (jumpDelta != 0)
+            {
+                desiredVelocity.y = jumpDelta / Time.deltaTime;
+            }
+            lastJumpHeight = newJumpHeight;
         }
         
         //smooth out velocity
         velocity = Vector2.SmoothDamp(velocity, desiredVelocity, ref acceleration, 0.1f);
     }
+    #endregion
+
+    #region Jump Logic
+    float jumpTick = -1;
+    int jumpsRemaining = 0;
+    float lastJumpHeight = 0;
 
     //will return true if a jump was made
     bool UpdateJump(bool tryJump)
@@ -125,7 +148,6 @@ public class PlayerController : MonoBehaviour {
         if (jumpsRemaining > 0 || numberOfJumps == -1)
         {
             if (tryJump){
-                jumpTick = 0; //start jump
                 OnJump();
                 didJump = true;
             }
@@ -135,7 +157,25 @@ public class PlayerController : MonoBehaviour {
 
     void OnJump()
     {
-        velocity = Vector2.zero;
+        jumpTick = 0; //start jump
+        lastJumpHeight = 0;
+        velocity *= 0.5f;
         jumpsRemaining--; //decrement remaining jumps
     }
+
+    #endregion
+
+    #region Gliding logic
+
+    bool isGliding = false;
+
+    void UpdateGliding(bool tryGlide)
+    {
+        if (characterController.isGrounded == false)
+        {
+            isGliding = tryGlide;
+        }
+    }
+
+    #endregion
 }
