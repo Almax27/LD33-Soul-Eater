@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: 460cccee979177d48a5069240b1c8046
-timeCreated: 1440274407
+guid: da707294591fa2042974b28f950800a3
+timeCreated: 1440276352
 licenseType: Free
 ModelImporter:
   serializedVersion: 18
@@ -115,7 +115,7 @@ ModelImporter:
       name: airjump
       takeName: Take 001
       firstFrame: 0
-      lastFrame: 60
+      lastFrame: 15
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
