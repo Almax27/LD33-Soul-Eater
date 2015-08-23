@@ -1,0 +1,323 @@
+fileFormatVersion: 2
+guid: 089979ea726f3cf46a19c4727f601560
+timeCreated: 1440361373
+licenseType: Free
+ModelImporter:
+  serializedVersion: 18
+  fileIDToRecycleName:
+    100000: Base Human001LIKTarget
+    100002: Base Human001RFinger11
+    100004: Base Human001RFinger12
+    100006: Base Human001RFinger13
+    100008: Base Human001RFinger14
+    100010: Base Human001RIKTarget
+    100012: bn_knight_armL
+    100014: bn_knight_armR
+    100016: bn_knight_chest
+    100018: bn_knight_collarL
+    100020: bn_knight_collarR
+    100022: bn_knight_footL
+    100024: bn_knight_footR
+    100026: bn_knight_forearmL
+    100028: bn_knight_forearmR
+    100030: bn_knight_handL
+    100032: bn_knight_handR
+    100034: bn_knight_head
+    100036: bn_knight_legL
+    100038: bn_knight_legR
+    100040: bn_knight_lowerlegL
+    100042: bn_knight_lowerlegR
+    100044: bn_knight_neck
+    100046: bn_knight_root
+    100048: bn_knight_spine1
+    100050: bn_knight_spine2
+    100052: bn_knight_spine3
+    100054: bn_knight_toeL
+    100056: bn_knight_toeR
+    100058: knight_armL
+    100060: knight_armR
+    100062: knight_belt
+    100064: knight_body
+    100066: knight_chestarmor
+    100068: knight_forearmL
+    100070: knight_forearmR
+    100072: knight_handL
+    100074: knight_handR
+    100076: knight_head
+    100078: knight_shoulderL
+    100080: knight_shoulderR
+    100082: //RootNode
+    100084: KnightRig01
+    100086: KnightRig06
+    100088: KnightRig07
+    100090: KnightRig08
+    100092: KnightRig13
+    100094: KnightRig30
+    100096: swordKnight
+    400000: Base Human001LIKTarget
+    400002: Base Human001RFinger11
+    400004: Base Human001RFinger12
+    400006: Base Human001RFinger13
+    400008: Base Human001RFinger14
+    400010: Base Human001RIKTarget
+    400012: bn_knight_armL
+    400014: bn_knight_armR
+    400016: bn_knight_chest
+    400018: bn_knight_collarL
+    400020: bn_knight_collarR
+    400022: bn_knight_footL
+    400024: bn_knight_footR
+    400026: bn_knight_forearmL
+    400028: bn_knight_forearmR
+    400030: bn_knight_handL
+    400032: bn_knight_handR
+    400034: bn_knight_head
+    400036: bn_knight_legL
+    400038: bn_knight_legR
+    400040: bn_knight_lowerlegL
+    400042: bn_knight_lowerlegR
+    400044: bn_knight_neck
+    400046: bn_knight_root
+    400048: bn_knight_spine1
+    400050: bn_knight_spine2
+    400052: bn_knight_spine3
+    400054: bn_knight_toeL
+    400056: bn_knight_toeR
+    400058: knight_armL
+    400060: knight_armR
+    400062: knight_belt
+    400064: knight_body
+    400066: knight_chestarmor
+    400068: knight_forearmL
+    400070: knight_forearmR
+    400072: knight_handL
+    400074: knight_handR
+    400076: knight_head
+    400078: knight_shoulderL
+    400080: knight_shoulderR
+    400082: //RootNode
+    400084: KnightRig01
+    400086: KnightRig06
+    400088: KnightRig07
+    400090: KnightRig08
+    400092: KnightRig13
+    400094: KnightRig30
+    400096: swordKnight
+    4300000: knight_head
+    4300002: knight_armR
+    4300004: knight_forearmR
+    4300006: knight_body
+    4300008: knight_shoulderR
+    4300010: knight_chestarmor
+    4300012: knight_belt
+    4300014: knight_handR
+    4300016: knight_shoulderL
+    4300018: knight_armL
+    4300020: knight_forearmL
+    4300022: knight_handL
+    4300024: swordKnight
+    7400000: knight_sword_attack
+    9500000: //RootNode
+    13700000: knight_armL
+    13700002: knight_armR
+    13700004: knight_belt
+    13700006: knight_body
+    13700008: knight_chestarmor
+    13700010: knight_forearmL
+    13700012: knight_forearmR
+    13700014: knight_handL
+    13700016: knight_handR
+    13700018: knight_head
+    13700020: knight_shoulderL
+    13700022: knight_shoulderR
+    13700024: swordKnight
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: knight_sword_attack
+      takeName: Take 001
+      firstFrame: 0
+      lastFrame: 7
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Base Human001LIKTarget
+        weight: 1
+      - path: Base Human001RIKTarget
+        weight: 1
+      - path: bn_knight_root
+        weight: 1
+      - path: bn_knight_root/bn_knight_legL
+        weight: 1
+      - path: bn_knight_root/bn_knight_legL/bn_knight_lowerlegL
+        weight: 1
+      - path: bn_knight_root/bn_knight_legL/bn_knight_lowerlegL/bn_knight_footL
+        weight: 1
+      - path: bn_knight_root/bn_knight_legL/bn_knight_lowerlegL/bn_knight_footL/bn_knight_toeL
+        weight: 1
+      - path: bn_knight_root/bn_knight_legR
+        weight: 1
+      - path: bn_knight_root/bn_knight_legR/bn_knight_lowerlegR
+        weight: 1
+      - path: bn_knight_root/bn_knight_legR/bn_knight_lowerlegR/bn_knight_footR
+        weight: 1
+      - path: bn_knight_root/bn_knight_legR/bn_knight_lowerlegR/bn_knight_footR/bn_knight_toeR
+        weight: 1
+      - path: bn_knight_root/bn_knight_spine1
+        weight: 1
+      - path: bn_knight_root/bn_knight_spine1/bn_knight_spine2
+        weight: 1
+      - path: bn_knight_root/bn_knight_spine1/bn_knight_spine2/bn_knight_spine3
+        weight: 1
+      - path: bn_knight_root/bn_knight_spine1/bn_knight_spine2/bn_knight_spine3/bn_knight_chest
+        weight: 1
+      - path: bn_knight_root/bn_knight_spine1/bn_knight_spine2/bn_knight_spine3/bn_knight_chest/bn_knight_collarL
+        weight: 1
+      - path: bn_knight_root/bn_knight_spine1/bn_knight_spine2/bn_knight_spine3/bn_knight_chest/bn_knight_collarL/bn_knight_armL
+        weight: 1
+      - path: bn_knight_root/bn_knight_spine1/bn_knight_spine2/bn_knight_spine3/bn_knight_chest/bn_knight_collarL/bn_knight_armL/bn_knight_forearmL
+        weight: 1
+      - path: bn_knight_root/bn_knight_spine1/bn_knight_spine2/bn_knight_spine3/bn_knight_chest/bn_knight_collarL/bn_knight_armL/bn_knight_forearmL/bn_knight_handL
+        weight: 1
+      - path: bn_knight_root/bn_knight_spine1/bn_knight_spine2/bn_knight_spine3/bn_knight_chest/bn_knight_collarL/bn_knight_armL/bn_knight_forearmL/bn_knight_handL/KnightRig06
+        weight: 1
+      - path: bn_knight_root/bn_knight_spine1/bn_knight_spine2/bn_knight_spine3/bn_knight_chest/bn_knight_collarL/bn_knight_armL/bn_knight_forearmL/bn_knight_handL/KnightRig06/KnightRig07
+        weight: 1
+      - path: bn_knight_root/bn_knight_spine1/bn_knight_spine2/bn_knight_spine3/bn_knight_chest/bn_knight_collarL/bn_knight_armL/bn_knight_forearmL/bn_knight_handL/KnightRig06/KnightRig07/KnightRig08
+        weight: 1
+      - path: bn_knight_root/bn_knight_spine1/bn_knight_spine2/bn_knight_spine3/bn_knight_chest/bn_knight_collarR
+        weight: 1
+      - path: bn_knight_root/bn_knight_spine1/bn_knight_spine2/bn_knight_spine3/bn_knight_chest/bn_knight_collarR/bn_knight_armR
+        weight: 1
+      - path: bn_knight_root/bn_knight_spine1/bn_knight_spine2/bn_knight_spine3/bn_knight_chest/bn_knight_collarR/bn_knight_armR/bn_knight_forearmR
+        weight: 1
+      - path: bn_knight_root/bn_knight_spine1/bn_knight_spine2/bn_knight_spine3/bn_knight_chest/bn_knight_collarR/bn_knight_armR/bn_knight_forearmR/bn_knight_handR
+        weight: 1
+      - path: bn_knight_root/bn_knight_spine1/bn_knight_spine2/bn_knight_spine3/bn_knight_chest/bn_knight_collarR/bn_knight_armR/bn_knight_forearmR/bn_knight_handR/Base
+          Human001RFinger11
+        weight: 1
+      - path: bn_knight_root/bn_knight_spine1/bn_knight_spine2/bn_knight_spine3/bn_knight_chest/bn_knight_collarR/bn_knight_armR/bn_knight_forearmR/bn_knight_handR/Base
+          Human001RFinger11/Base Human001RFinger12
+        weight: 1
+      - path: bn_knight_root/bn_knight_spine1/bn_knight_spine2/bn_knight_spine3/bn_knight_chest/bn_knight_collarR/bn_knight_armR/bn_knight_forearmR/bn_knight_handR/Base
+          Human001RFinger11/Base Human001RFinger12/Base Human001RFinger13
+        weight: 1
+      - path: bn_knight_root/bn_knight_spine1/bn_knight_spine2/bn_knight_spine3/bn_knight_chest/bn_knight_collarR/bn_knight_armR/bn_knight_forearmR/bn_knight_handR/Base
+          Human001RFinger11/Base Human001RFinger12/Base Human001RFinger13/Base Human001RFinger14
+        weight: 1
+      - path: bn_knight_root/bn_knight_spine1/bn_knight_spine2/bn_knight_spine3/bn_knight_chest/bn_knight_neck
+        weight: 1
+      - path: bn_knight_root/bn_knight_spine1/bn_knight_spine2/bn_knight_spine3/bn_knight_chest/bn_knight_neck/bn_knight_head
+        weight: 1
+      - path: knight_armL
+        weight: 1
+      - path: knight_armR
+        weight: 1
+      - path: knight_belt
+        weight: 1
+      - path: knight_body
+        weight: 1
+      - path: knight_chestarmor
+        weight: 1
+      - path: knight_forearmL
+        weight: 1
+      - path: knight_forearmR
+        weight: 1
+      - path: knight_handL
+        weight: 1
+      - path: knight_handR
+        weight: 1
+      - path: knight_head
+        weight: 1
+      - path: knight_shoulderL
+        weight: 1
+      - path: knight_shoulderR
+        weight: 1
+      - path: KnightRig01
+        weight: 1
+      - path: KnightRig13
+        weight: 1
+      - path: KnightRig30
+        weight: 1
+      - path: swordKnight
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
