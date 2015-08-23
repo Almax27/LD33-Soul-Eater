@@ -17,6 +17,8 @@ public class PlayerController : MonoBehaviour {
     public AnimationCurve jumpCurve = new AnimationCurve();
     public int numberOfJumps = 2;
     public float glidingScale = 0.3f;
+    public float groundedStateTimeout = 0.1f; //time isGrounded remains true after characterController reports false
+    public LayerMask floorCastMask = new LayerMask();
 
     [Header("Combat")]
     public float dashAttackDistance = 1.0f;
@@ -26,6 +28,8 @@ public class PlayerController : MonoBehaviour {
 
     #region unity methods
 
+    Vector3 initialPosition = Vector3.zero;
+
 	// Use this for initialization
 	void Start () 
 	{
@@ -34,11 +38,14 @@ public class PlayerController : MonoBehaviour {
 			characterController = GetComponent<CharacterController>();
 		}
         jumpsRemaining = numberOfJumps;
+        initialPosition = transform.position;
 	}
 	
 	// Update is called once per frame
 	void Update () 
 	{
+        HandleDebugInput();
+
         //get input
         float horizontalInput = Input.GetAxis("Horizontal");
         bool tryJump = Input.GetKeyDown("space");
@@ -46,6 +53,7 @@ public class PlayerController : MonoBehaviour {
         bool tryDashAttack = Input.GetButtonDown("Attack1");
 
         //update systems
+        UpdateGrounded();
         UpdateRotation(horizontalInput);
         bool didJump = UpdateJump(tryJump);
         UpdateGliding(tryGlide);
@@ -53,7 +61,7 @@ public class PlayerController : MonoBehaviour {
         UpdateVelocity(horizontalInput);
 
         //update animator state
-        animator.SetBool("isGrounded", characterController.isGrounded);
+        animator.SetBool("isGrounded", isGrounded);
         if (velocity.x != 0)
         {
             animator.SetFloat("hSpeed", Mathf.Abs(velocity.x) / groundSpeed);
@@ -64,7 +72,7 @@ public class PlayerController : MonoBehaviour {
         animator.SetFloat("vSpeed", velocity.y);
         if (didJump)
         {
-            if(characterController.isGrounded)
+            if(isGrounded)
             {
                 animator.SetTrigger("onJump");
             }
@@ -77,14 +85,25 @@ public class PlayerController : MonoBehaviour {
 
 		// convert velocity to displacement and Move the character:
 		characterController.Move(velocity * Time.deltaTime);
+        Vector3 pos = characterController.transform.position;
+        pos.z = 0;
+        characterController.transform.position = pos;
 	}
+
+    void HandleDebugInput()
+    {
+        if (Input.GetKey("r"))
+        {
+            transform.position = initialPosition;
+        }
+    }
 
     #endregion
 
     #region Rotation Logic
     bool facingRight = true;
-    float yRot = 0;
-    float yRotVel = 0;
+    Vector3 rot = Vector3.zero;
+    Vector3 rotVel = Vector3.zero;
 
     void UpdateRotation(float horizontalInput)
     {
@@ -97,8 +116,28 @@ public class PlayerController : MonoBehaviour {
             facingRight = false;
         }
         float desiredYRot = facingRight ? 90 : -90;
-        yRot = Mathf.SmoothDamp(yRot, desiredYRot, ref yRotVel, turnRate);
-        transform.localEulerAngles = new Vector3(0, yRot, 0);
+        rot.y = Mathf.SmoothDamp(rot.y, desiredYRot, ref rotVel.y, turnRate);
+
+        float desiredZRot = 0;
+        if(isGrounded)
+        {
+            if(floorTangent.y > 0) //right incline
+            {
+                desiredZRot = Vector3.Angle(Vector3.right, floorTangent);
+            }
+            else //left incline
+            {
+                desiredZRot = -Vector3.Angle(Vector3.right, floorTangent);
+            }
+            desiredZRot *= facingRight ? -1 : 1;
+            if(velocity.x < 1.0f)
+            {
+                desiredZRot *= 0.6f;
+            }
+        }
+        rot.x = Mathf.SmoothDamp(rot.x, desiredZRot, ref rotVel.x, 0.2f);
+
+        animator.transform.localEulerAngles = rot;
     }
     #endregion
 
@@ -106,39 +145,63 @@ public class PlayerController : MonoBehaviour {
     Vector2 desiredVelocity = Vector2.zero;
     Vector2 velocity = Vector2.zero;
     Vector2 acceleration = Vector2.zero;
+    float accumulatedGravity = 0; 
+    float lastGroundedTime = 0;
+    bool isGrounded = false;
+
+    Vector3 floorTangent = Vector3.right;
+    
     void UpdateVelocity(float horizontalInput)
     {
-        //apply input
-        if (characterController.isGrounded)
+        RaycastHit hitInfo = new RaycastHit();
+        Ray ray = new Ray(this.transform.position, Vector3.down);
+        if (Physics.Raycast(ray, out hitInfo, 1.0f, floorCastMask))
         {
-            desiredVelocity.x = horizontalInput * groundSpeed;
+            floorTangent = Vector3.Cross(hitInfo.normal, Vector3.forward);
+            floorTangent.z = 0;
         } else
         {
-            desiredVelocity.x = horizontalInput * airSpeed;
+            floorTangent = Vector3.right;
+        }
+
+        Debug.DrawLine(ray.origin, ray.GetPoint(1.0f), Color.red);
+
+        Debug.DrawLine(this.transform.position, this.transform.position + floorTangent * 2.0f, Color.red);
+
+
+        //apply input
+        if (isGrounded)
+        {
+            desiredVelocity =  floorTangent * horizontalInput * groundSpeed;
+        } else
+        {
+            desiredVelocity = floorTangent * horizontalInput * airSpeed;
         }
 
         //apply attacking
         if (isDashAttacking)
         {
             //override movement
-            velocity = dashDirection * (dashAttackDistance / dashAttackDuration);
+            desiredVelocity = velocity = dashDirection * (dashAttackDistance / dashAttackDuration);
+            accumulatedGravity = 0;
             return;
         }
         
         //clear verical velocity if grounded to avoid gravity building it up too much
         if (characterController.isGrounded)
         {
-            desiredVelocity.y = 0;
+            accumulatedGravity = 0;
         }
 
         //apply gravity, scaled if gliding
         if (isGliding)
         {
-            desiredVelocity.y -= gravity * Time.deltaTime * glidingScale;
+            accumulatedGravity -= gravity * Time.deltaTime * glidingScale;
         } else
         {
-            desiredVelocity.y -= gravity * Time.deltaTime;
+            accumulatedGravity -= gravity * Time.deltaTime;
         }
+        desiredVelocity.y += accumulatedGravity;
 
         //calculate jump velocity
         //We calulate the delta step on the animation curve and then override gravity if not 0
@@ -150,6 +213,7 @@ public class PlayerController : MonoBehaviour {
             if (jumpDelta != 0)
             {
                 desiredVelocity.y = jumpDelta / Time.deltaTime;
+                accumulatedGravity = 0;
             }
             lastJumpHeight = newJumpHeight;
         }
@@ -158,6 +222,17 @@ public class PlayerController : MonoBehaviour {
         //velocity = Vector2.SmoothDamp(velocity, desiredVelocity, ref acceleration, 0.1f);
         velocity = desiredVelocity;
     }
+
+    void UpdateGrounded()
+    {
+        //update last grounded time
+        if (characterController.isGrounded)
+        {
+            lastGroundedTime = Time.time;
+        }
+        isGrounded = Time.time < lastGroundedTime + groundedStateTimeout;
+    }
+
     #endregion
 
     #region Jump Logic
@@ -170,7 +245,7 @@ public class PlayerController : MonoBehaviour {
     {
         bool didJump = false;
         //reset jumps if we've been grounded for a short time
-        if (characterController.isGrounded && jumpTick > 0.1f)
+        if (isGrounded && (jumpTick < 0 || jumpTick > 0.1f))
         {
             jumpsRemaining = numberOfJumps;
         }
@@ -192,6 +267,11 @@ public class PlayerController : MonoBehaviour {
         jumpsRemaining--; //decrement remaining jumps
     }
 
+    void CancelJump()
+    {
+        jumpTick = -1;
+    }
+
     #endregion
 
     #region Gliding logic
@@ -200,10 +280,7 @@ public class PlayerController : MonoBehaviour {
 
     void UpdateGliding(bool tryGlide)
     {
-        if (characterController.isGrounded == false)
-        {
-            isGliding = tryGlide;
-        }
+        isGliding = tryGlide && isGrounded == false;
     }
 
     #endregion
@@ -232,7 +309,13 @@ public class PlayerController : MonoBehaviour {
             isDashAttacking = true;
             dashAttackTick = 0;
             dashDirection = new Vector2(facingRight ? 1 : -1, 0);
+            OnDashAttack();
         }
+    }
+
+    void OnDashAttack()
+    {
+        CancelJump();
     }
 
     #endregion

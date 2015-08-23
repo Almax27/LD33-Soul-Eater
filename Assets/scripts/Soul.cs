@@ -22,7 +22,7 @@ public class Soul : MonoBehaviour
     public bool isCollected = false;
     public bool isCollectable = false;
 
-    public ParticleSystem particleSystem = null;
+    public ParticleSystem[] particleSystems = null;
 
     float tick = 0;
 
@@ -78,8 +78,14 @@ public class Soul : MonoBehaviour
         }
         if (isCollected)
         {
-            particleSystem.enableEmission = false;
-            if(particleSystem.IsAlive() == false)
+            bool allSystemsDead = true;
+            foreach(ParticleSystem psys in particleSystems)
+            {
+                //disable if all before it have finished
+                psys.enableEmission = false;
+                allSystemsDead &= psys.IsAlive() == false;
+            }
+            if(allSystemsDead)
             {
                 Destroy(gameObject);
             }
