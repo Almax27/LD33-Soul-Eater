@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: 0f236794a26fd6c4b8f0295a5db9f972
-timeCreated: 1440337542
+guid: cb941ebf66d55a24eb6808c08ab46494
+timeCreated: 1440342113
 licenseType: Free
 ModelImporter:
   serializedVersion: 18
@@ -9,7 +9,7 @@ ModelImporter:
     400000: //RootNode
     2300000: //RootNode
     3300000: //RootNode
-    4300000: O_Flat_Large0
+    4300000: O_Curve_Large1
     9500000: //RootNode
   materials:
     importMaterials: 1
