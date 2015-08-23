@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 60cade4b85756364db45d4ae919699bf
-timeCreated: 1440274407
+timeCreated: 1440349311
 licenseType: Free
 ModelImporter:
   serializedVersion: 18
@@ -115,13 +115,13 @@ ModelImporter:
       name: run
       takeName: Take 001
       firstFrame: 0
-      lastFrame: 16
+      lastFrame: 15
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
       loop: 0
-      loopTime: 1
+      loopTime: 0
       loopBlend: 0
       loopBlendOrientation: 0
       loopBlendPositionY: 0
