@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour {
     [Header("Component Links")]
 	public CharacterController characterController = null;
     public Animator animator = null;
+    public Animator wingAnimator = null;
 
     [Header("Platforming")]
     public float gravity = 9.8f;
@@ -15,6 +16,7 @@ public class PlayerController : MonoBehaviour {
 	public float airSpeed = 5;
 	public float turnRate = 0.3f; // time to turn 180
     public AnimationCurve jumpCurve = new AnimationCurve();
+    public AnimationCurve airJumpCurve = new AnimationCurve();
     public int numberOfJumps = 2;
     public float glidingScale = 0.3f;
     public float groundedStateTimeout = 0.1f; //time isGrounded remains true after characterController reports false
@@ -62,6 +64,7 @@ public class PlayerController : MonoBehaviour {
 
         //update animator state
         animator.SetBool("isGrounded", isGrounded);
+        wingAnimator.SetBool("isGliding", isGliding);
         if (velocity.x != 0)
         {
             animator.SetFloat("hSpeed", Mathf.Abs(velocity.x) / groundSpeed);
@@ -79,6 +82,7 @@ public class PlayerController : MonoBehaviour {
             else
             {
                 animator.SetTrigger("onAirJump");
+                wingAnimator.SetTrigger("onAirJump");
             }
         }
         animator.SetBool("isDashAttacking", isDashAttacking);
@@ -148,6 +152,7 @@ public class PlayerController : MonoBehaviour {
     float accumulatedGravity = 0; 
     float lastGroundedTime = 0;
     bool isGrounded = false;
+    float inputDrag = 0.0f;
 
     Vector3 floorTangent = Vector3.right;
     
@@ -176,6 +181,11 @@ public class PlayerController : MonoBehaviour {
         } else
         {
             desiredVelocity = floorTangent * horizontalInput * airSpeed;
+        }
+        if (inputDrag > 0)
+        {
+            inputDrag -= inputDrag * Time.deltaTime / 0.3f;
+            desiredVelocity *= Mathf.Clamp01(1-inputDrag);
         }
 
         //apply attacking
@@ -208,7 +218,7 @@ public class PlayerController : MonoBehaviour {
         if (jumpTick >= 0) //ensure tick is > 1 i.e. we've jumped at least once
         {
             jumpTick += Time.deltaTime;
-            float newJumpHeight = jumpCurve.Evaluate(jumpTick);
+            float newJumpHeight = wasLastJumpGrounded ? jumpCurve.Evaluate(jumpTick) : airJumpCurve.Evaluate(jumpTick);
             float jumpDelta = (newJumpHeight - lastJumpHeight);
             if (jumpDelta != 0)
             {
@@ -228,7 +238,12 @@ public class PlayerController : MonoBehaviour {
         //update last grounded time
         if (characterController.isGrounded)
         {
+            if(Time.time > lastGroundedTime + 0.2f)
+            {
+                inputDrag = 0.9f;
+            }
             lastGroundedTime = Time.time;
+            isGrounded = true;
         }
         isGrounded = Time.time < lastGroundedTime + groundedStateTimeout;
     }
@@ -239,6 +254,7 @@ public class PlayerController : MonoBehaviour {
     float jumpTick = -1;
     int jumpsRemaining = 0;
     float lastJumpHeight = 0;
+    bool wasLastJumpGrounded = true;
 
     //will return true if a jump was made
     bool UpdateJump(bool tryJump)
@@ -265,6 +281,7 @@ public class PlayerController : MonoBehaviour {
         lastJumpHeight = 0;
         velocity *= 0.5f;
         jumpsRemaining--; //decrement remaining jumps
+        wasLastJumpGrounded = isGrounded;
     }
 
     void CancelJump()
@@ -280,7 +297,7 @@ public class PlayerController : MonoBehaviour {
 
     void UpdateGliding(bool tryGlide)
     {
-        isGliding = tryGlide && isGrounded == false;
+        isGliding = tryGlide && isGrounded == false && velocity.y < 0;
     }
 
     #endregion
