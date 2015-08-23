@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: 49d8d20af2d89a043a0c9f6d7fe6e4a2
-timeCreated: 1440349106
+guid: 7141312336df1ca40a9e9be474c00d5f
+timeCreated: 1440350867
 licenseType: Free
 ModelImporter:
   serializedVersion: 18
@@ -45,7 +45,7 @@ ModelImporter:
       name: wingbat_open
       takeName: Take 001
       firstFrame: 1
-      lastFrame: 10
+      lastFrame: 14
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
