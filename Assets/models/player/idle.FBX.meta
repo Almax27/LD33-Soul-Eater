@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 3ef6240a752047943850f0ad56435755
-timeCreated: 1440274407
+timeCreated: 1440362224
 licenseType: Free
 ModelImporter:
   serializedVersion: 18
@@ -115,13 +115,13 @@ ModelImporter:
       name: idle
       takeName: Take 001
       firstFrame: 0
-      lastFrame: 60
+      lastFrame: 110
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
       loop: 0
-      loopTime: 1
+      loopTime: 0
       loopBlend: 0
       loopBlendOrientation: 0
       loopBlendPositionY: 0
