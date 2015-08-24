@@ -9,6 +9,8 @@ public class PlayerController : MonoBehaviour {
 	public CharacterController characterController = null;
     public Animator animator = null;
     public Animator wingAnimator = null;
+    public RagDollHelper ragDollHelper = null;
+    public Transform chestNode = null;
 
     [Header("Platforming")]
     public float gravity = 9.8f;
@@ -25,12 +27,18 @@ public class PlayerController : MonoBehaviour {
     [Header("Combat")]
     public float dashAttackDistance = 1.0f;
     public float dashAttackDuration = 0.2f;
+    public GameObject[] spawnOnAttack = new GameObject[0];
+    public GameObject[] spawnOnDashAttack = new GameObject[0];
 
     #endregion
 
     #region unity methods
 
     Vector3 initialPosition = Vector3.zero;
+
+    void Awake()
+    {
+    }
 
 	// Use this for initialization
 	void Start () 
@@ -46,25 +54,37 @@ public class PlayerController : MonoBehaviour {
 	// Update is called once per frame
 	void Update () 
 	{
-        HandleDebugInput();
-
         //get input
         float horizontalInput = Input.GetAxis("Horizontal");
+        float verticalInput = Input.GetAxis("Vertical");
         bool tryJump = Input.GetKeyDown("space");
         bool tryGlide = Input.GetKey("space");
-        bool tryDashAttack = Input.GetButtonDown("Attack1");
+
+        AttackState desiredAttackState = AttackState.None;
+        if (Input.GetButtonDown("Attack1"))
+        {
+            desiredAttackState = AttackState.Attacking;
+        } else if (Input.GetButtonDown("Attack2"))
+        {
+            desiredAttackState = AttackState.DashAttacking;
+        }
 
         //update systems
         UpdateGrounded();
-        UpdateRotation(horizontalInput);
+        UpdateRotation(horizontalInput, verticalInput < 0);
         bool didJump = UpdateJump(tryJump);
         UpdateGliding(tryGlide);
-        UpdateDashAttack(tryDashAttack, horizontalInput);
+        AttackState changedToAttackState = UpdateAttack(desiredAttackState);
         UpdateVelocity(horizontalInput);
 
         //update animator state
+        if(changedToAttackState != AttackState.None)
+        {
+            animator.SetTrigger("onAttack");
+        }
+        animator.SetBool("isDashing", attackState == AttackState.DashAttacking);
         animator.SetBool("isGrounded", isGrounded);
-        wingAnimator.SetBool("isGliding", isGliding);
+        wingAnimator.SetBool("isOpen", isGliding); 
         if (velocity.x != 0)
         {
             animator.SetFloat("hSpeed", Mathf.Abs(velocity.x) / groundSpeed);
@@ -82,10 +102,9 @@ public class PlayerController : MonoBehaviour {
             else
             {
                 animator.SetTrigger("onAirJump");
-                wingAnimator.SetTrigger("onAirJump");
+                wingAnimator.SetTrigger("onFlap");
             }
         }
-        animator.SetBool("isDashAttacking", isDashAttacking);
 
 		// convert velocity to displacement and Move the character:
 		characterController.Move(velocity * Time.deltaTime);
@@ -94,14 +113,6 @@ public class PlayerController : MonoBehaviour {
         characterController.transform.position = pos;
 	}
 
-    void HandleDebugInput()
-    {
-        if (Input.GetKey("r"))
-        {
-            transform.position = initialPosition;
-        }
-    }
-
     #endregion
 
     #region Rotation Logic
@@ -109,18 +120,28 @@ public class PlayerController : MonoBehaviour {
     Vector3 rot = Vector3.zero;
     Vector3 rotVel = Vector3.zero;
 
-    void UpdateRotation(float horizontalInput)
+    void UpdateRotation(float horizontalInput, bool tryLookForward)
     {
         //rotate the player to face direction of movement
+        bool updateLooking = true;
+        float desiredYRot = facingRight ? 90 : -90;
         if (horizontalInput > 0 && facingRight == false)
         {
+            desiredYRot = 90;
             facingRight = true;
         } else if (horizontalInput < 0 && facingRight == true)
         {
             facingRight = false;
+            desiredYRot = -90;
+        } else if (tryLookForward && horizontalInput == 0)
+        {
+            desiredYRot = 180;
+        } else
+        {
+            updateLooking = false;
         }
-        float desiredYRot = facingRight ? 90 : -90;
-        rot.y = Mathf.SmoothDamp(rot.y, desiredYRot, ref rotVel.y, turnRate);
+
+        rot.y = Mathf.SmoothDampAngle(rot.y, desiredYRot, ref rotVel.y, turnRate);
 
         float desiredZRot = 0;
         if(isGrounded)
@@ -138,6 +159,7 @@ public class PlayerController : MonoBehaviour {
             {
                 desiredZRot *= 0.6f;
             }
+            desiredZRot = Mathf.Clamp(desiredZRot, -20, 20);
         }
         rot.x = Mathf.SmoothDamp(rot.x, desiredZRot, ref rotVel.x, 0.2f);
 
@@ -188,8 +210,8 @@ public class PlayerController : MonoBehaviour {
             desiredVelocity *= Mathf.Clamp01(1-inputDrag);
         }
 
-        //apply attacking
-        if (isDashAttacking)
+        //apply dashing
+        if (attackState == AttackState.DashAttacking)
         {
             //override movement
             desiredVelocity = velocity = dashDirection * (dashAttackDistance / dashAttackDuration);
@@ -261,14 +283,15 @@ public class PlayerController : MonoBehaviour {
     {
         bool didJump = false;
         //reset jumps if we've been grounded for a short time
-        if (isGrounded && (jumpTick < 0 || jumpTick > 0.1f))
+        if (characterController.isGrounded && jumpTick > 0.1f)
         {
             jumpsRemaining = numberOfJumps;
         }
-        if (jumpsRemaining > 0 || numberOfJumps == -1)
+        if (jumpsRemaining > 0)
         {
             if (tryJump){
                 OnJump();
+                print(jumpsRemaining);
                 didJump = true;
             }
         }
@@ -303,36 +326,95 @@ public class PlayerController : MonoBehaviour {
     #endregion
 
     #region Attack Logic
-    bool isDashAttacking = false;
-    float dashAttackTick = 0;
-    Vector2 dashDirection = Vector2.zero;
-
-    //returns true if we're currently in a state of attacking
-    void UpdateDashAttack(bool tryAttack, float horizontalInput)
+    enum AttackState
     {
-        if (dashAttackTick < dashAttackDuration)
+        None,
+        Attacking,
+        DashAttacking
+    }
+    AttackState attackState = AttackState.None;
+
+    Vector2 dashDirection = Vector2.zero;
+    float endAttackTime = 0;
+
+    AttackState UpdateAttack(AttackState desiredState)
+    {
+        if (Time.time > endAttackTime)
         {
-            dashAttackTick += Time.deltaTime;
-            if(dashAttackTick > dashAttackDuration)
+            if(attackState == AttackState.DashAttacking)
             {
-                dashAttackTick = dashAttackDuration;
-                isDashAttacking = false;
-                print("End dash");
+                OnDashAttackEnd();
+            }
+            attackState = AttackState.None;
+        }
+        AttackState oldState = attackState;
+        if (attackState == AttackState.None)
+        {
+            switch (desiredState)
+            {
+                case AttackState.Attacking:
+                {
+                    attackState = AttackState.Attacking;
+                    endAttackTime = Time.time + 0.2f;
+                    OnAttack();
+                    return AttackState.Attacking;
+                    //break;
+                }
+                case AttackState.DashAttacking:
+                {
+                    attackState = AttackState.DashAttacking;
+                    dashDirection = new Vector2(facingRight ? 1 : -1, 0);
+                    endAttackTime = Time.time + dashAttackDuration;
+                    OnDashAttack();
+                    return AttackState.DashAttacking;
+                    //break;
+                }
             }
         }
-        if (tryAttack == true && isDashAttacking == false)
+        return AttackState.None;
+    }
+
+    void OnAttack()
+    {
+        inputDrag = 0.9f;
+        foreach (GameObject gobj in spawnOnAttack)
         {
-            print("dash attack");
-            isDashAttacking = true;
-            dashAttackTick = 0;
-            dashDirection = new Vector2(facingRight ? 1 : -1, 0);
-            OnDashAttack();
+            GameObject instance = (GameObject)Instantiate(gobj);
+            instance.transform.parent = animator.transform;
+            instance.transform.localPosition = Vector3.zero;
+            instance.transform.localRotation = Quaternion.identity;
         }
     }
 
     void OnDashAttack()
     {
         CancelJump();
+        gameObject.layer = LayerMask.NameToLayer("PlayerDashing");
+        foreach (GameObject gobj in spawnOnDashAttack)
+        {
+            GameObject instance = (GameObject)Instantiate(gobj);
+            instance.transform.parent = animator.transform;
+            instance.transform.localPosition = Vector3.zero;
+            instance.transform.localRotation = Quaternion.identity;
+        }
+    }
+
+    void OnDashAttackEnd()
+    {
+        gameObject.layer = LayerMask.NameToLayer("Player");
+    }
+
+    #endregion
+
+    #region Death Logic
+
+    void OnDeath()
+    {
+        print("Player died!");
+        ragDollHelper.SetIsRagDoll(true);
+        this.enabled = false;
+        characterController.enabled = false;
+        Destroy(gameObject, 5);
     }
 
     #endregion

@@ -6,6 +6,7 @@ public class SoulCollector : MonoBehaviour {
     public float attractionRadius = 2.0f;
     public float collectionRadius = 0.1f;
     public LayerMask layerMask = new LayerMask();
+    public Transform target = null;
 
 
 	// Use this for initialization
@@ -39,4 +40,12 @@ public class SoulCollector : MonoBehaviour {
             }
         }
 	}
+
+    void Update()
+    {
+        if(target)
+        {
+            this.transform.position = target.position;
+        }
+    }
 }
