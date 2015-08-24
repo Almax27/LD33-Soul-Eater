@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 7efcaf93ec9ad2c4db7f257d558006a9
-timeCreated: 1440440549
+timeCreated: 1440443247
 licenseType: Free
 ModelImporter:
   serializedVersion: 18
@@ -41,7 +41,6 @@ ModelImporter:
     100066: mesh_left_leg
     100068: mesh_right_arm
     100070: mesh_right_leg
-    100072: sword
     400000: //RootNode
     400002: Base Human
     400004: Base HumanHead
@@ -78,14 +77,12 @@ ModelImporter:
     400066: mesh_left_leg
     400068: mesh_right_arm
     400070: mesh_right_leg
-    400072: sword
     4300000: mesh_body
     4300002: mesh_head
     4300004: mesh_right_arm
     4300006: mesh_left_arm
     4300008: mesh_right_leg
     4300010: mesh_left_leg
-    4300012: sword
     7400000: attack
     9500000: //RootNode
     13700000: mesh_body
@@ -94,7 +91,6 @@ ModelImporter:
     13700006: mesh_left_leg
     13700008: mesh_right_arm
     13700010: mesh_right_leg
-    13700012: sword
   materials:
     importMaterials: 1
     materialName: 0
@@ -226,8 +222,6 @@ ModelImporter:
       - path: mesh_right_arm
         weight: 1
       - path: mesh_right_leg
-        weight: 1
-      - path: sword
         weight: 1
       maskType: 0
       maskSource: {instanceID: 0}
