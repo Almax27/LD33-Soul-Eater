@@ -52,8 +52,7 @@ public class Projectile : MonoBehaviour {
 
     void OnHit(RaycastHit hitInfo)
     {
-        //print("Projectile hit: " + hitInfo.collider.gameObject.name);
-        hitInfo.collider.gameObject.SendMessageUpwards("OnDamage", damage);
+        hitInfo.collider.gameObject.SendMessage("OnDamage", damage, SendMessageOptions.DontRequireReceiver);
         foreach (GameObject gobj in spawnOnHit)
         {
             GameObject obj = (GameObject)Instantiate(gobj, hitInfo.point, this.transform.rotation);

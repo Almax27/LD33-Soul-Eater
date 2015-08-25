@@ -114,7 +114,7 @@ ModelImporter:
     - serializedVersion: 16
       name: attack
       takeName: Take 001
-      firstFrame: 1
+      firstFrame: 0
       lastFrame: 10
       wrapMode: 0
       orientationOffsetY: 0

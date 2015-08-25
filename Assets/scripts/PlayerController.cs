@@ -3,30 +3,58 @@ using System.Collections;
 
 public class PlayerController : MonoBehaviour {
 
+    #region public types
+
+    [System.Serializable]
+    public class Unlockable
+    {
+        public string name = "Unknown";
+        public bool isUnlocked = false;
+        public GameObject[] gameobjects = new GameObject[0]; //this will be activated / deactivated
+        public void SetUnlockedState(bool unlocked)
+        {
+            isUnlocked = unlocked;
+            foreach (GameObject gobj in gameobjects)
+            {
+                gobj.SetActive(isUnlocked);
+            }
+            Debug.Log(name + " is " + (unlocked ? "unlocked" : "locked"));
+        }
+    }
+
+    #endregion
+
     #region public variables
 
     [Header("Component Links")]
 	public CharacterController characterController = null;
     public Animator animator = null;
-    public Animator wingAnimator = null;
+    public Animator[] wingAnimators = new Animator[0];
     public RagDollHelper ragDollHelper = null;
     public Transform chestNode = null;
+    public MeleeWeaponTrail weapon = null;
+    public Transform weaponAtSide = null;
+
+    [Header("Unlockables")]
+    public Unlockable firstWing = new Unlockable(); //grants double jump
+    public Unlockable secondWing = new Unlockable(); //grants glide and dash
+    public Unlockable armsAndSword = new Unlockable(); //grants attack and turns dash into an attack
 
     [Header("Platforming")]
-    public float gravity = 9.8f;
+    public float gravity = 40f;
 	public float groundSpeed = 10; // units per second
 	public float airSpeed = 5;
 	public float turnRate = 0.3f; // time to turn 180
     public AnimationCurve jumpCurve = new AnimationCurve();
     public AnimationCurve airJumpCurve = new AnimationCurve();
-    public int numberOfJumps = 2;
-    public float glidingScale = 0.3f;
+    public float glidingGravity = 4.0f;
+    public float dashDistance = 1.0f;
+    public float dashDuration = 0.2f;
     public float groundedStateTimeout = 0.1f; //time isGrounded remains true after characterController reports false
     public LayerMask floorCastMask = new LayerMask();
 
-    [Header("Combat")]
-    public float dashAttackDistance = 1.0f;
-    public float dashAttackDuration = 0.2f;
+    [Header("Spawns")]
+    public GameObject[] spawnOnJump = new GameObject[0];
     public GameObject[] spawnOnAttack = new GameObject[0];
     public GameObject[] spawnOnDashAttack = new GameObject[0];
 
@@ -38,18 +66,18 @@ public class PlayerController : MonoBehaviour {
 
     void Awake()
     {
-    }
-
-	// Use this for initialization
-	void Start () 
-	{
-		if (!characterController) 
-		{
-			characterController = GetComponent<CharacterController>();
-		}
-        jumpsRemaining = numberOfJumps;
+        if (!characterController) 
+        {
+            characterController = GetComponent<CharacterController>();
+        }
+        jumpsRemaining = getNumberOfJumps();
         initialPosition = transform.position;
-	}
+        
+        //initialise unlockables
+        firstWing.SetUnlockedState(false);
+        secondWing.SetUnlockedState(false);
+        armsAndSword.SetUnlockedState(false);
+    }
 	
 	// Update is called once per frame
 	void Update () 
@@ -59,6 +87,7 @@ public class PlayerController : MonoBehaviour {
         float verticalInput = Input.GetAxis("Vertical");
         bool tryJump = Input.GetKeyDown("space");
         bool tryGlide = Input.GetKey("space");
+        bool tryDash = false;
 
         AttackState desiredAttackState = AttackState.None;
         if (Input.GetButtonDown("Attack1"))
@@ -67,6 +96,7 @@ public class PlayerController : MonoBehaviour {
         } else if (Input.GetButtonDown("Attack2"))
         {
             desiredAttackState = AttackState.DashAttacking;
+            tryDash = true;
         }
 
         //update systems
@@ -74,17 +104,54 @@ public class PlayerController : MonoBehaviour {
         UpdateRotation(horizontalInput, verticalInput < 0);
         bool didJump = UpdateJump(tryJump);
         UpdateGliding(tryGlide);
-        AttackState changedToAttackState = UpdateAttack(desiredAttackState);
+        UpdateDash(tryDash);
+        bool didAttack = UpdateAttack(desiredAttackState);
         UpdateVelocity(horizontalInput);
 
+        //update animation
+        UpdateAnimatorStates(didJump, didAttack);
+        UpdateWingAnimatorStates(didJump);
+
+		// convert velocity to displacement and Move the character:
+		characterController.Move(velocity * Time.deltaTime);
+        Vector3 pos = characterController.transform.position;
+        pos.z = 0;
+        characterController.transform.position = pos;
+	}
+
+    #endregion
+
+    #region Animation Logic
+
+    void UpdateWingAnimatorStates(bool didJump)
+    {
+        foreach (Animator wingAnim in wingAnimators)
+        {
+            if(wingAnim.isActiveAndEnabled)
+            {
+                wingAnim.SetBool("isOpen", isGliding); 
+            }
+            if(didJump && !isGrounded)
+            {
+                wingAnim.SetTrigger("onFlap");
+            }
+        }
+    }
+    void UpdateAnimatorStates(bool didJump, bool didAttack)
+    {
+        //early out if our animator isn't active yet
+        if (animator == null || animator.isActiveAndEnabled == false)
+        {
+            return;
+        }
+
         //update animator state
-        if(changedToAttackState != AttackState.None)
+        if(didAttack)
         {
             animator.SetTrigger("onAttack");
         }
-        animator.SetBool("isDashing", attackState == AttackState.DashAttacking);
+        animator.SetBool("isDashing", Time.time < endDashTime);
         animator.SetBool("isGrounded", isGrounded);
-        wingAnimator.SetBool("isOpen", isGliding); 
         if (velocity.x != 0)
         {
             animator.SetFloat("hSpeed", Mathf.Abs(velocity.x) / groundSpeed);
@@ -102,16 +169,9 @@ public class PlayerController : MonoBehaviour {
             else
             {
                 animator.SetTrigger("onAirJump");
-                wingAnimator.SetTrigger("onFlap");
             }
         }
-
-		// convert velocity to displacement and Move the character:
-		characterController.Move(velocity * Time.deltaTime);
-        Vector3 pos = characterController.transform.position;
-        pos.z = 0;
-        characterController.transform.position = pos;
-	}
+    }
 
     #endregion
 
@@ -211,10 +271,10 @@ public class PlayerController : MonoBehaviour {
         }
 
         //apply dashing
-        if (attackState == AttackState.DashAttacking)
+        if (Time.time < endDashTime)
         {
             //override movement
-            desiredVelocity = velocity = dashDirection * (dashAttackDistance / dashAttackDuration);
+            desiredVelocity = velocity = dashDirection * (dashDistance / dashDuration);
             accumulatedGravity = 0;
             return;
         }
@@ -228,7 +288,7 @@ public class PlayerController : MonoBehaviour {
         //apply gravity, scaled if gliding
         if (isGliding)
         {
-            accumulatedGravity -= gravity * Time.deltaTime * glidingScale;
+            accumulatedGravity -= glidingGravity * Time.deltaTime;
         } else
         {
             accumulatedGravity -= gravity * Time.deltaTime;
@@ -237,7 +297,7 @@ public class PlayerController : MonoBehaviour {
 
         //calculate jump velocity
         //We calulate the delta step on the animation curve and then override gravity if not 0
-        if (jumpTick >= 0) //ensure tick is > 1 i.e. we've jumped at least once
+        if (hasJumped) //ensure tick is > 1 i.e. we've jumped at least once
         {
             jumpTick += Time.deltaTime;
             float newJumpHeight = wasLastJumpGrounded ? jumpCurve.Evaluate(jumpTick) : airJumpCurve.Evaluate(jumpTick);
@@ -260,9 +320,10 @@ public class PlayerController : MonoBehaviour {
         //update last grounded time
         if (characterController.isGrounded)
         {
-            if(Time.time > lastGroundedTime + 0.2f)
+            if(Time.time > lastGroundedTime + groundedStateTimeout)
             {
                 inputDrag = 0.9f;
+                OnGrounded();
             }
             lastGroundedTime = Time.time;
             isGrounded = true;
@@ -270,9 +331,16 @@ public class PlayerController : MonoBehaviour {
         isGrounded = Time.time < lastGroundedTime + groundedStateTimeout;
     }
 
+    void OnGrounded()
+    {
+        hasJumped = false;
+        jumpsRemaining = getNumberOfJumps();
+    }
+
     #endregion
 
     #region Jump Logic
+    bool hasJumped = false;
     float jumpTick = -1;
     int jumpsRemaining = 0;
     float lastJumpHeight = 0;
@@ -282,16 +350,10 @@ public class PlayerController : MonoBehaviour {
     bool UpdateJump(bool tryJump)
     {
         bool didJump = false;
-        //reset jumps if we've been grounded for a short time
-        if (characterController.isGrounded && jumpTick > 0.1f)
-        {
-            jumpsRemaining = numberOfJumps;
-        }
         if (jumpsRemaining > 0)
         {
             if (tryJump){
                 OnJump();
-                print(jumpsRemaining);
                 didJump = true;
             }
         }
@@ -305,11 +367,22 @@ public class PlayerController : MonoBehaviour {
         velocity *= 0.5f;
         jumpsRemaining--; //decrement remaining jumps
         wasLastJumpGrounded = isGrounded;
+        hasJumped = true;
+
+        foreach (GameObject gobj in spawnOnJump)
+        {
+            Instantiate(gobj, transform.position, transform.rotation);
+        }
     }
 
     void CancelJump()
     {
-        jumpTick = -1;
+        hasJumped = false;
+    }
+
+    int getNumberOfJumps()
+    {
+        return firstWing.isUnlocked ? 2 : 1;
     }
 
     #endregion
@@ -320,7 +393,22 @@ public class PlayerController : MonoBehaviour {
 
     void UpdateGliding(bool tryGlide)
     {
-        isGliding = tryGlide && isGrounded == false && velocity.y < 0;
+        isGliding = secondWing.isUnlocked && tryGlide && isGrounded == false && velocity.y < 0;
+    }
+
+    #endregion
+
+    #region DashLogic
+
+    float endDashTime = 0;
+
+    void UpdateDash(bool tryDash)
+    {
+        if (tryDash && secondWing.isUnlocked && Time.time > endDashTime + dashDuration)
+        {
+            dashDirection = new Vector2(facingRight ? 1 : -1, 0);
+            endDashTime = Time.time + dashDuration;
+        }
     }
 
     #endregion
@@ -337,7 +425,7 @@ public class PlayerController : MonoBehaviour {
     Vector2 dashDirection = Vector2.zero;
     float endAttackTime = 0;
 
-    AttackState UpdateAttack(AttackState desiredState)
+    bool UpdateAttack(AttackState desiredState)
     {
         if (Time.time > endAttackTime)
         {
@@ -348,34 +436,38 @@ public class PlayerController : MonoBehaviour {
             attackState = AttackState.None;
         }
         AttackState oldState = attackState;
-        if (attackState == AttackState.None)
+        if (armsAndSword.isUnlocked && attackState == AttackState.None)
         {
             switch (desiredState)
             {
                 case AttackState.Attacking:
                 {
                     attackState = AttackState.Attacking;
-                    endAttackTime = Time.time + 0.2f;
                     OnAttack();
-                    return AttackState.Attacking;
-                    //break;
+                    break;
                 }
                 case AttackState.DashAttacking:
                 {
-                    attackState = AttackState.DashAttacking;
-                    dashDirection = new Vector2(facingRight ? 1 : -1, 0);
-                    endAttackTime = Time.time + dashAttackDuration;
-                    OnDashAttack();
-                    return AttackState.DashAttacking;
-                    //break;
+                    if(secondWing.isUnlocked)
+                    {
+                        attackState = AttackState.DashAttacking;
+                        OnDashAttack();
+                    }
+                    break;
                 }
             }
+            bool didAttack = attackState != AttackState.None;
+            weapon.Emit = weapon.GetComponent<Renderer>().enabled = didAttack;
+            weaponAtSide.gameObject.SetActive(!didAttack);
+            return didAttack;
         }
-        return AttackState.None;
+
+        return false;
     }
 
     void OnAttack()
     {
+        endAttackTime = Time.time + 0.3f;
         inputDrag = 0.9f;
         foreach (GameObject gobj in spawnOnAttack)
         {
@@ -388,8 +480,7 @@ public class PlayerController : MonoBehaviour {
 
     void OnDashAttack()
     {
-        CancelJump();
-        gameObject.layer = LayerMask.NameToLayer("PlayerDashing");
+        endAttackTime = Time.time + dashDuration;
         foreach (GameObject gobj in spawnOnDashAttack)
         {
             GameObject instance = (GameObject)Instantiate(gobj);
@@ -397,6 +488,7 @@ public class PlayerController : MonoBehaviour {
             instance.transform.localPosition = Vector3.zero;
             instance.transform.localRotation = Quaternion.identity;
         }
+        gameObject.layer = LayerMask.NameToLayer("PlayerDashing");
     }
 
     void OnDashAttackEnd()
@@ -410,11 +502,14 @@ public class PlayerController : MonoBehaviour {
 
     void OnDeath()
     {
-        print("Player died!");
-        ragDollHelper.SetIsRagDoll(true);
-        this.enabled = false;
-        characterController.enabled = false;
-        Destroy(gameObject, 5);
+        if (this.enabled)
+        {
+            print("Player died!");
+            ragDollHelper.SetIsRagDoll(true);
+            this.enabled = false;
+            characterController.enabled = false;
+            Destroy(gameObject, 5);
+        }
     }
 
     #endregion

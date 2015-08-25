@@ -6,6 +6,7 @@ public class Health : MonoBehaviour {
     public int maxHealth = 10;
     public int currentHealth = 10;
 
+    public GameObject[] spawnOnDamage = new GameObject[0];
     public GameObject[] spawnOnDeath = new GameObject[0];
 
     bool isDead = false;
@@ -24,7 +25,13 @@ public class Health : MonoBehaviour {
 	void OnDamage(int damage)
     {
         currentHealth -= damage;
-        if (!isDead && currentHealth < 0)
+
+        foreach (GameObject gobj in spawnOnDamage)
+        {
+            Instantiate(gobj, this.transform.position, this.transform.rotation);
+        }
+
+        if (!isDead && currentHealth <= 0)
         {
             currentHealth = 0;
             isDead = true;
@@ -36,7 +43,7 @@ public class Health : MonoBehaviour {
     {
         foreach (GameObject gobj in spawnOnDeath)
         {
-            GameObject instance = (GameObject)Instantiate(gobj, this.transform.position, this.transform.rotation);
+            Instantiate(gobj, this.transform.position, this.transform.rotation);
         }
     }
 }

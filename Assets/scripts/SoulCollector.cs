@@ -8,6 +8,10 @@ public class SoulCollector : MonoBehaviour {
     public LayerMask layerMask = new LayerMask();
     public Transform target = null;
 
+    public GameObject[] spawnOnPickup = new GameObject[0];
+
+    bool followingTarget = false;
+
 
 	// Use this for initialization
 	void Start () {
@@ -17,34 +21,49 @@ public class SoulCollector : MonoBehaviour {
 	// Update is called once per frame
 	void FixedUpdate () 
     {
-        //handle attraction
-        Collider[] attractables = Physics.OverlapSphere(transform.position, attractionRadius, layerMask);
-        foreach (Collider collider in attractables)
+        if (followingTarget)
         {
-            Soul soul = collider.GetComponent<Soul>();
-            if(soul)
+            //handle attraction
+            Collider[] attractables = Physics.OverlapSphere(transform.position, attractionRadius, layerMask);
+            foreach (Collider collider in attractables)
             {
-                soul.target = this.transform;
+                Soul soul = collider.GetComponent<Soul>();
+                if (soul)
+                {
+                    soul.target = this.transform;
+                }
             }
-        }
 
-        //handle collection
-        Collider[] collectables = Physics.OverlapSphere(transform.position, collectionRadius, layerMask);
-        foreach (Collider collider in collectables)
-        {
-            Soul soul = collider.GetComponent<Soul>();
-            if(soul && soul.isCollectable && soul.isCollected == false)
+            //handle collection
+            Collider[] collectables = Physics.OverlapSphere(transform.position, collectionRadius, layerMask);
+            foreach (Collider collider in collectables)
             {
-                soul.isCollected = true;
-                GameManager.instance.score += soul.soulValue;
+                Soul soul = collider.GetComponent<Soul>();
+                if (soul && soul.isCollectable && soul.isCollected == false)
+                {
+                    soul.isCollected = true;
+                    GameManager gameManager = FindObjectOfType<GameManager>();
+                    gameManager.score += soul.soulValue;
+                    OnPickup();
+                }
             }
         }
 	}
 
+    void OnPickup()
+    {
+        foreach (GameObject gobj in spawnOnPickup)
+        {
+            Instantiate(gobj, transform.position, transform.rotation);
+        }
+    }
+
     void Update()
     {
+        followingTarget = false;
         if(target)
         {
+            followingTarget = true;
             this.transform.position = target.position;
         }
     }

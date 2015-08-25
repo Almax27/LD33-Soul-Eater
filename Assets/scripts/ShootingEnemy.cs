@@ -37,54 +37,53 @@ public class ShootingEnemy : MonoBehaviour {
     {
         ammoRemaining = maxAmmo;
         characterController = GetComponent<CharacterController>();
-	}
-	
-	// Update is called once per frame
-	void FixedUpdate () 
+    }
+
+    void Update()
     {
         FindTarget();
         UpdateAim();
-
         if ((target && Time.time > lastFoundTargetTime + startShootingDelay) || 
             (!target && Time.time < lastLostTargetTime + stopShootingDelay))
         {
             TryShoot();
         }
-	}
-
-    void Update()
-    {
         UpdateGravity(Time.deltaTime);
         Vector3 velocity = new Vector3(0, accumulatedGravity, 0);
         characterController.Move(velocity * Time.deltaTime);
     }
 
+    float lastTargetCheck = 0;
     void FindTarget()
     {
-        if (target != null)
+        if (Time.time > lastTargetCheck + 0.2f)
         {
-            Vector3 targetDir = target.position - projectileSpawnNode.position;
-            bool isVisionObstructed = Physics.Raycast(projectileSpawnNode.position, targetDir.normalized, targetDir.magnitude, visionMask);
-            if (isVisionObstructed)
+            lastTargetCheck = Time.time;
+            if (target != null)
             {
-                target = null;
-                lastLostTargetTime = Time.time;
-            }
-        } else
-        {
-            Collider[] colliders = Physics.OverlapSphere(transform.position, range, targetMask);
-            if (colliders.Length > 0)
-            {
-                Transform potentialTarget = colliders [0].transform.FindChild("ProjectileTarget");
-                if(potentialTarget == null)
+                Vector3 targetDir = target.position - projectileSpawnNode.position;
+                bool isVisionObstructed = Physics.Raycast(projectileSpawnNode.position, targetDir.normalized, targetDir.magnitude, visionMask);
+                if (isVisionObstructed)
                 {
-                    potentialTarget = colliders [0].transform;
+                    target = null;
+                    lastLostTargetTime = Time.time;
                 }
-                Vector3 targetDir = potentialTarget.position - projectileSpawnNode.position;
-                if (!Physics.Raycast(projectileSpawnNode.position, targetDir.normalized, targetDir.magnitude, visionMask))
+            } else
+            {
+                Collider[] colliders = Physics.OverlapSphere(transform.position, range, targetMask);
+                if (colliders.Length > 0)
                 {
-                    target = potentialTarget;
-                    lastFoundTargetTime = Time.time;
+                    Transform potentialTarget = colliders [0].transform.FindChild("ProjectileTarget");
+                    if (potentialTarget == null)
+                    {
+                        potentialTarget = colliders [0].transform;
+                    }
+                    Vector3 targetDir = potentialTarget.position - projectileSpawnNode.position;
+                    if (!Physics.Raycast(projectileSpawnNode.position, targetDir.normalized, targetDir.magnitude, visionMask))
+                    {
+                        target = potentialTarget;
+                        lastFoundTargetTime = Time.time;
+                    }
                 }
             }
         }
@@ -129,11 +128,17 @@ public class ShootingEnemy : MonoBehaviour {
         //update look direction
         float desiredYRot = aimDirection.x > 0 ? 90 : -90;
         yRot = Mathf.SmoothDampAngle(yRot, desiredYRot, ref yRotVel, 0.1f);
-        animator.transform.eulerAngles = new Vector3(0, yRot, 0);
+        if (yRot != desiredYRot)
+        {
+            animator.transform.eulerAngles = new Vector3(0, yRot, 0);
+        }
 
         //update animator
         tLook = Mathf.SmoothDamp(tLook, desiredTLook, ref tLookVel, 0.2f);
-        animator.SetFloat("tLook", 1-tLook);
+        if (tLook != desiredTLook)
+        {
+            animator.SetFloat("tLook", 1 - tLook);
+        }
     }
 
     float accumulatedGravity = 0;

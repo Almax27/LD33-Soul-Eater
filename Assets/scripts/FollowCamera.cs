@@ -4,6 +4,7 @@ using System.Collections;
 public class FollowCamera : MonoBehaviour {
 
     public Transform target = null;
+    public Vector3 targetOffset = new Vector3(0,0,0);
     public float lookDamp = 0.3f;
     public float followDamp = 0.5f;
     public Vector3 offset = new Vector3(0,2,-10);
@@ -24,7 +25,7 @@ public class FollowCamera : MonoBehaviour {
     {
         if (target)
         {
-            desiredPosition = lastTargetPosition = target.position;
+            desiredPosition = lastTargetPosition = target.position + targetOffset;
         }
 	}
 	
@@ -59,9 +60,16 @@ public class FollowCamera : MonoBehaviour {
 //
 //            lastTargetPosition = target.position;
 
-            desiredPosition = target.position;
+            desiredPosition = target.position + targetOffset;
             transform.position = Vector3.SmoothDamp(transform.position, desiredPosition + offset, ref followVelocity, followDamp);
-            lookAtPosition = Vector3.SmoothDamp(lookAtPosition, desiredPosition, ref lookAtPositionVelocity, lookDamp);
+            if(lookAtPosition == Vector3.zero)
+            {
+                lookAtPosition = desiredPosition;
+            }
+            else
+            {
+                lookAtPosition = Vector3.SmoothDamp(lookAtPosition, desiredPosition, ref lookAtPositionVelocity, lookDamp);
+            }
             transform.LookAt(lookAtPosition);
         }
 	}
