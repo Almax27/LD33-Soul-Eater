@@ -176,9 +176,9 @@ public class PlayerController : MonoBehaviour {
     #endregion
 
     #region Rotation Logic
-    bool facingRight = true;
-    Vector3 rot = Vector3.zero;
-    Vector3 rotVel = Vector3.zero;
+    public bool facingRight = true;
+    public Vector3 rot = Vector3.zero;
+    public Vector3 rotVel = Vector3.zero;
 
     void UpdateRotation(float horizontalInput, bool tryLookForward)
     {
@@ -228,13 +228,13 @@ public class PlayerController : MonoBehaviour {
     #endregion
 
     #region Movement Logic
-    Vector2 desiredVelocity = Vector2.zero;
-    Vector2 velocity = Vector2.zero;
-    Vector2 acceleration = Vector2.zero;
-    float accumulatedGravity = 0; 
-    float lastGroundedTime = 0;
-    bool isGrounded = false;
-    float inputDrag = 0.0f;
+    public Vector2 desiredVelocity = Vector2.zero;
+    public Vector2 velocity = Vector2.zero;
+    public Vector2 acceleration = Vector2.zero;
+    public float accumulatedGravity = 0; 
+    public float lastGroundedTime = 0;
+    public bool isGrounded = false;
+    public float inputDrag = 0.0f;
 
     Vector3 floorTangent = Vector3.right;
     
@@ -244,7 +244,7 @@ public class PlayerController : MonoBehaviour {
         Ray ray = new Ray(this.transform.position, Vector3.down);
         if (Physics.Raycast(ray, out hitInfo, 1.0f, floorCastMask))
         {
-            floorTangent = Vector3.Cross(hitInfo.normal, Vector3.forward);
+            floorTangent = Vector3.Cross(hitInfo.normal, Vector3.forward).normalized;
             floorTangent.z = 0;
         } else
         {
@@ -266,7 +266,7 @@ public class PlayerController : MonoBehaviour {
         }
         if (inputDrag > 0)
         {
-            inputDrag -= inputDrag * Time.deltaTime / 0.3f;
+            inputDrag -= Time.deltaTime / 0.3f;
             desiredVelocity *= Mathf.Clamp01(1-inputDrag);
         }
 
@@ -340,11 +340,11 @@ public class PlayerController : MonoBehaviour {
     #endregion
 
     #region Jump Logic
-    bool hasJumped = false;
-    float jumpTick = -1;
-    int jumpsRemaining = 0;
-    float lastJumpHeight = 0;
-    bool wasLastJumpGrounded = true;
+    public bool hasJumped = false;
+    public float jumpTick = -1;
+    public int jumpsRemaining = 0;
+    public float lastJumpHeight = 0;
+    public bool wasLastJumpGrounded = true;
 
     //will return true if a jump was made
     bool UpdateJump(bool tryJump)
